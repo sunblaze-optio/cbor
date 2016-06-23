@@ -4,6 +4,7 @@ use std::collections::HashMap;
 
 use serde::de::{self, SeqVisitor};
 use serde::ser;
+use serde::Tagger;
 
 /// An enum over all possible CBOR types.
 #[derive(Clone, Debug, PartialEq)]
@@ -26,6 +27,8 @@ pub enum Value {
     Bool(bool),
     /// Represents the absence of a value or the value undefined.
     Null,
+    /// Represents a tagged value.
+    Tag(u64, Box<Value>),
 }
 
 impl Value {
@@ -222,69 +225,69 @@ impl de::Deserialize for Value {
             type Value = Value;
 
             #[inline]
-            fn visit_str<E>(&mut self, value: &str) -> Result<Value, E>
+            fn visit_str<E>(&mut self, v:&str) -> Result<Value, E>
                 where E: de::Error
             {
-                self.visit_string(String::from(value))
+                self.visit_string(String::from(v))
             }
 
             #[inline]
-            fn visit_string<E>(&mut self, value: String) -> Result<Value, E>
+            fn visit_string<E>(&mut self, v:String) -> Result<Value, E>
                 where E: de::Error
             {
-                Ok(Value::String(value))
+                Ok(Value::String(v))
             }
             #[inline]
-            fn visit_bytes<E>(&mut self, v: &[u8]) -> Result<Self::Value, E>
+            fn visit_bytes<E>(&mut self, v: &[u8]) -> Result<Value, E>
                 where E: de::Error
             {
                 self.visit_byte_buf(v.to_owned())
             }
 
             #[inline]
-            fn visit_byte_buf<E>(&mut self, v: Vec<u8>) -> Result<Self::Value, E>
+            fn visit_byte_buf<E>(&mut self, v: Vec<u8>) -> Result<Value, E>
                 where E: de::Error
             {
                 Ok(Value::Bytes(v))
             }
 
             #[inline]
-            fn visit_u64<E>(&mut self, v: u64) -> Result<Self::Value, E>
+            fn visit_u64<E>(&mut self, v: u64) -> Result<Value, E>
                 where E: de::Error
             {
                 Ok(Value::U64(v))
             }
 
             #[inline]
-            fn visit_i64<E>(&mut self, v: i64) -> Result<Self::Value, E>
+            fn visit_i64<E>(&mut self, v: i64) -> Result<Value, E>
                 where E: de::Error
             {
                 Ok(Value::I64(v))
             }
 
             #[inline]
-            fn visit_bool<E>(&mut self, v: bool) -> Result<Self::Value, E>
+            fn visit_bool<E>(&mut self, v: bool) -> Result<Value, E>
                 where E: de::Error
             {
                 Ok(Value::Bool(v))
             }
 
             #[inline]
-            fn visit_none<E>(&mut self) -> Result<Self::Value, E>
+            fn visit_none<E>(&mut self) -> Result<Value, E>
                 where E: de::Error
             {
                 self.visit_unit()
             }
 
             #[inline]
-            fn visit_unit<E>(&mut self) -> Result<Self::Value, E>
+            fn visit_unit<E>(&mut self) -> Result<Value, E>
                 where E: de::Error
             {
                 Ok(Value::Null)
             }
 
             #[inline]
-            fn visit_seq<V>(&mut self, visitor: V) -> Result<Self::Value, V::Error>
+            fn visit_seq<V>(&mut self, visitor: V) -> Result<Value, V::Error>
                 where V: SeqVisitor
             {
                 let values = try!(de::impls::VecVisitor::new().visit_seq(visitor));
@@ -300,11 +303,22 @@ impl de::Deserialize for Value {
             }
 
             #[inline]
-            fn visit_f64<E>(&mut self, v: f64) -> Result<Self::Value, E>
+            fn visit_f64<E>(&mut self, v: f64) -> Result<Value, E>
                 where E: de::Error
             {
                 Ok(Value::F64(v))
             }
+            #[inline]
+            fn visit_tagged_value<T, D>(&mut self, tag: T, deserializer: &mut D)
+                    -> Result<Self::Value, D::Error>
+                    where T: Tagger, D: de::Deserializer 
+                {
+                    let val = try!(de::Deserialize::deserialize(deserializer));
+                    if let Some(t) = tag.u64_tag("cbor") {
+                        return Ok(Value::Tag(t, Box::new(val)));
+                    }
+                    Ok(val)
+                }
         }
 
         deserializer.deserialize(ValueVisitor)
@@ -327,6 +341,7 @@ impl ser::Serialize for Value {
             Value::F64(v) => serializer.serialize_f64(v),
             Value::Bool(v) => serializer.serialize_bool(v),
             Value::Null => serializer.serialize_unit(),
+            Value::Tag(t, ref v) => serializer.serialize_tagged_value(::Tagger(t), v),
         }
     }
 }
@@ -457,62 +472,62 @@ impl de::Deserialize for ObjectKey {
             type Value = ObjectKey;
 
             #[inline]
-            fn visit_str<E>(&mut self, value: &str) -> Result<Self::Value, E>
+            fn visit_str<E>(&mut self, v: &str) -> Result<ObjectKey, E>
                 where E: de::Error
             {
-                self.visit_string(String::from(value))
+                self.visit_string(String::from(v))
             }
 
             #[inline]
-            fn visit_string<E>(&mut self, value: String) -> Result<Self::Value, E>
+            fn visit_string<E>(&mut self, v:String) -> Result<ObjectKey, E>
                 where E: de::Error
             {
-                Ok(ObjectKey::String(value))
+                Ok(ObjectKey::String(v))
             }
             #[inline]
-            fn visit_bytes<E>(&mut self, v: &[u8]) -> Result<Self::Value, E>
+            fn visit_bytes<E>(&mut self, v: &[u8]) -> Result<ObjectKey, E>
                 where E: de::Error
             {
                 self.visit_byte_buf(v.to_owned())
             }
 
             #[inline]
-            fn visit_byte_buf<E>(&mut self, v: Vec<u8>) -> Result<Self::Value, E>
+            fn visit_byte_buf<E>(&mut self, v: Vec<u8>) -> Result<ObjectKey, E>
                 where E: de::Error
             {
                 Ok(ObjectKey::Bytes(v))
             }
 
             #[inline]
-            fn visit_u64<E>(&mut self, v: u64) -> Result<Self::Value, E>
+            fn visit_u64<E>(&mut self, v: u64) -> Result<ObjectKey, E>
                 where E: de::Error
             {
                 Ok(ObjectKey::Integer(v as i64))
             }
 
             #[inline]
-            fn visit_i64<E>(&mut self, v: i64) -> Result<Self::Value, E>
+            fn visit_i64<E>(&mut self, v: i64) -> Result<ObjectKey, E>
                 where E: de::Error
             {
                 Ok(ObjectKey::Integer(v))
             }
 
             #[inline]
-            fn visit_bool<E>(&mut self, v: bool) -> Result<Self::Value, E>
+            fn visit_bool<E>(&mut self, v: bool) -> Result<ObjectKey, E>
                 where E: de::Error
             {
                 Ok(ObjectKey::Bool(v))
             }
 
             #[inline]
-            fn visit_none<E>(&mut self) -> Result<Self::Value, E>
+            fn visit_none<E>(&mut self) -> Result<ObjectKey, E>
                 where E: de::Error
             {
                 self.visit_unit()
             }
 
             #[inline]
-            fn visit_unit<E>(&mut self) -> Result<Self::Value, E>
+            fn visit_unit<E>(&mut self) -> Result<ObjectKey, E>
                 where E: de::Error
             {
                 Ok(ObjectKey::Null)

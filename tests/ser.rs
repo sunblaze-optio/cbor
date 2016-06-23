@@ -3,7 +3,7 @@ extern crate serde_cbor;
 
 use std::collections::HashMap;
 
-use serde_cbor::{to_vec, to_vec_sd, from_slice};
+use serde_cbor::{Value, to_vec, to_vec_sd, from_slice};
 
 #[test]
 fn test_string() {
@@ -83,4 +83,13 @@ fn test_integer() {
 fn test_self_describing() {
     let vec = to_vec_sd(&0).unwrap();
     assert_eq!(vec, b"\xd9\xd9\xf7\x00");
+}
+
+#[test]
+fn test_tagged_value() {
+    let value = Value::Tag(0, Box::new(Value::String("2016-06-23T11:38:01Z".to_owned())));
+    let vec = to_vec(&value).unwrap();
+    assert_eq!(vec, b"\xc0\x742016-06-23T11:38:01Z");
+    let roundtrip = from_slice(&vec[..]).unwrap();
+    assert_eq!(value, roundtrip);
 }

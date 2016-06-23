@@ -148,10 +148,9 @@ impl<R: Read> Deserializer<R> {
     }
 
     #[inline]
-    fn parse_tag<V: Visitor>(&mut self, first: u8, visitor: V) -> Result<V::Value> {
-        try!(self.parse_additional_information(first));
-        self.first = Some(try!(self.read_u8()));
-        self.parse_value(visitor)
+    fn parse_tag<V: Visitor>(&mut self, first: u8, mut visitor: V) -> Result<V::Value> {
+        let tag = try!(self.parse_additional_information(first));
+        visitor.visit_tagged_value(::Tagger(try!(tag.ok_or(Error::Syntax))), self)
     }
 
     #[inline]

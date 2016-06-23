@@ -120,9 +120,11 @@ extern crate serde;
 pub use de::{from_slice, from_reader};
 pub use error::{Error, Result};
 pub use ser::{to_vec, to_writer, to_vec_sd, to_writer_sd};
+pub use tagger::Tagger;
 pub use value::{Value, ObjectKey};
 
 pub mod de;
 pub mod error;
 pub mod ser;
+mod tagger;
 pub mod value;

@@ -121,7 +121,7 @@ fn test_float() {
 #[test]
 fn test_self_describing() {
     let value: error::Result<Value> = de::from_slice(&[0xd9, 0xd9, 0xf7, 0x66, 0x66, 0x6f, 0x6f, 0x62, 0x61, 0x72]);
-    assert_eq!(value.unwrap(), Value::String("foobar".to_owned()));
+    assert_eq!(value.unwrap(), Value::Tag(55799, Box::new(Value::String("foobar".to_owned()))));
 }
 
 

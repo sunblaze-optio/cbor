@@ -4,6 +4,7 @@ use std::io::Write;
 
 use byteorder::{BigEndian, WriteBytesExt};
 use serde::ser::{self, Serialize, SeqVisitor, MapVisitor};
+use serde::Tagger;
 
 use super::error::{Error, Result};
 
@@ -201,6 +202,17 @@ impl<W: Write> ser::Serializer for Serializer<W> {
         try!(self.writer.write_u8(0x82));
         try!(self.serialize_str(variant));
         self.serialize_map(visitor)
+    }
+    #[inline]
+    fn serialize_tagged_value<T, V>(&mut self,
+                                 tag: T,
+                                 value: V) -> Result<()>
+        where T: Tagger, V: Serialize,
+    {
+        if let Some(t) = tag.u64_tag("cbor") {
+            try!(self.compact_type(6, t));
+        }
+        value.serialize(self)
     }
 }
 
