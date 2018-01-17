@@ -9,6 +9,9 @@
 // except according to those terms.
 
 use std::collections::BTreeMap;
+use std::borrow::ToOwned;
+use std::string::String;
+use std::vec::Vec;
 
 use serde::{self, Serialize};
 use error::Error;

@@ -2,6 +2,7 @@
 use byteorder::{ByteOrder, BigEndian};
 use serde::ser::{self, Serialize};
 use std::io;
+use std::vec::Vec;
 
 use error::{Error, Result};
 

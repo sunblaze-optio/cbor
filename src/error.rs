@@ -5,6 +5,8 @@ use std::error;
 use std::fmt;
 use std::io;
 use std::result;
+use std::boxed::Box;
+use std::string::{String, ToString};
 
 /// This type represents all possible errors that can occur when serializing or deserializing CBOR
 /// data.

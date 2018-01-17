@@ -13,8 +13,9 @@ keywords = ["serde", "cbor", "serialization"]
 categories = ["encoding"]
 
 [dependencies]
-byteorder = "1.0.0"
-serde = "1.0.14"
+byteorder = { path = "/sgx/third_party/byteorder" }
+serde = { git = "https://github.com/ekiden/serde.git" }
+sgx_tstd = { path = "/sgx/sgx_tstd" }
 
 [dev-dependencies]
 serde_bytes = "0.10"

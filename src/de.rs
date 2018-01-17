@@ -6,6 +6,7 @@ use std::io;
 use std::str;
 use std::f32;
 use std::result;
+use std::vec::Vec;
 
 use error::{Error, Result, ErrorCode};
 use read::Reference;

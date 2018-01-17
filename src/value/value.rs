@@ -2,6 +2,9 @@
 
 use std::collections::BTreeMap;
 use std::fmt;
+use std::borrow::ToOwned;
+use std::string::String;
+use std::vec::Vec;
 
 use serde::de;
 use serde::ser;

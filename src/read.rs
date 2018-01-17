@@ -1,5 +1,6 @@
 use std::cmp;
 use std::io::{self, Read as StdRead};
+use std::vec::Vec;
 
 use error::{Result, Error, ErrorCode};
 

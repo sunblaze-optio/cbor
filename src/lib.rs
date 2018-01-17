@@ -128,8 +128,11 @@
 
 #![deny(missing_docs)]
 
+#![no_std]
+
 extern crate byteorder;
 
+extern crate sgx_tstd as std;
 #[macro_use]
 extern crate serde;
 
