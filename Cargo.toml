@@ -13,9 +13,9 @@ keywords = ["serde", "cbor", "serialization"]
 categories = ["encoding"]
 
 [dependencies]
-byteorder = { path = "/sgx/third_party/byteorder" }
+byteorder = { git = "https://github.com/ekiden/rust-sgx-sdk" }
 serde = { git = "https://github.com/ekiden/serde.git" }
-sgx_tstd = { path = "/sgx/sgx_tstd" }
+sgx_tstd = { git = "https://github.com/ekiden/rust-sgx-sdk" }
 
 [dev-dependencies]
 serde_bytes = "0.10"
