@@ -1,5 +1,5 @@
 [package]
-name = "serde_cbor"
+name = "serde_cbor-sgx"
 version = "0.8.1"
 authors = [
     "Pyfisch <pyfisch@gmail.com>",
@@ -12,9 +12,12 @@ description = "CBOR support for serde."
 keywords = ["serde", "cbor", "serialization"]
 categories = ["encoding"]
 
+[lib]
+name = "serde_cbor"
+
 [dependencies]
 byteorder = { git = "https://github.com/ekiden/rust-sgx-sdk" }
-serde = { git = "https://github.com/ekiden/serde.git" }
+serde-sgx = { git = "https://github.com/ekiden/serde.git" }
 sgx_tstd = { git = "https://github.com/ekiden/rust-sgx-sdk" }
 
 [dev-dependencies]
