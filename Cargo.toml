@@ -16,8 +16,8 @@ categories = ["encoding"]
 name = "serde_cbor"
 
 [dependencies]
-byteorder = { git = "https://github.com/ekiden/rust-sgx-sdk" }
-serde-sgx = { git = "https://github.com/ekiden/serde.git" }
+byteorder-sgx = { git = "https://github.com/ekiden/byteorder" }
+serde-sgx = { git = "https://github.com/ekiden/serde" }
 sgx_tstd = { git = "https://github.com/ekiden/rust-sgx-sdk" }
 
 [dev-dependencies]
