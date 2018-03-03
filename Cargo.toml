@@ -14,7 +14,7 @@ categories = ["encoding"]
 
 [dependencies]
 byteorder = "1.0.0"
-serde = "1.0.14"
+serde = { git = "https://github.com/ekiden/serde" }
 
 [dev-dependencies]
 serde_bytes = "0.10"
